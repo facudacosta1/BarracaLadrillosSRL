@@ -69,29 +69,20 @@ function agregarAlCarrito(id) {
     }
 }
 
+function comprar(id) {
+    const producto = productos.find(producto => producto.id === id);
+    if (producto && producto.cantidadEnStock > 0) {
+        carrito.agregarProducto(producto);
+        mostrarCarrito();
+    } else {
+        alert('Stock insuficiente o producto no encontrado.');
+    }
+}
+
 function eliminarDelCarrito(id) {
     carrito.eliminarProducto(id);
     mostrarCarrito();
 }
-
-
-
-function comprar(metodoDePago) {
-    const total = carrito.calcularTotal(metodoDePago); 
-    const modalBody = document.querySelector('#exampleModal .modal-body');
-    modalBody.textContent = `Total de la compra: $${total.toFixed(2)}`;
-    alert(`Total de la compra: $${total.toFixed(2)}`);
-    carrito.productos.forEach(producto => {
-        const productoOriginal = productos.find(p => p.id === producto.id);
-        productoOriginal.cantidadEnStock -= 1;  
-    });
-    localStorage.setItem('productos', JSON.stringify(productos));  
-    carrito.productos = [];  
-    mostrarProductos();
-    mostrarCarrito();
-}
-
-
 
 document.getElementById('formularioProducto').addEventListener('submit', function(event) {
     event.preventDefault();
@@ -107,35 +98,28 @@ document.getElementById('formularioProducto').addEventListener('submit', functio
 
 function mostrarProductos() {
     const listaProductos = document.getElementById('listaDeProductos');
-    listaProductos.innerHTML = ''; 
+    let content = '';
     productos.forEach(producto => {
-        const itemProducto = document.createElement('li');
-        itemProducto.textContent = `${producto.nombre}: ${producto.cantidadEnStock} en stock, costo: ${producto.costo}`;
+
+        content += `
+
+        <div class="col d-flex align-items-start bg-body-secondary">
+          <div class="m-4" id="prodContainer">
+            <h3 class="fs-2 text-body-emphasis">${producto.nombre}</h3>
+            <p>${producto.descripcion}</p>
+            <p>${producto.cantidadEnStock} en stock</p>
+            <p>$ ${producto.cantidadEnStock}</p>
+            <button class="btn btn-primary" onclick="comprar(${producto.id})">Comprar</button>
+          </div>
+        </div>
         
-        const botonAgregar = document.createElement('button');
-        botonAgregar.textContent = 'Agregar al Carrito';
-        botonAgregar.addEventListener('click', () => {
-            agregarAlCarrito(producto.id);
-        });
-        
-        itemProducto.appendChild(botonAgregar);
-        listaProductos.appendChild(itemProducto);
+        `
     });
+    listaProductos.innerHTML=content;
 }
 
 
+
+
+
 document.addEventListener('DOMContentLoaded', mostrarCarrito);
-
-/*<div class="col d-flex align-items-start">
-          <div class="icon-square text-body-emphasis bg-body-secondary d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
-            <svg class="bi" width="1em" height="1em"><use xlink:href="#toggles2"></use></svg>
-          </div>
-          <div>
-            <h3 class="fs-2 text-body-emphasis">${producto.nombre}</h3>
-            <p>${producto.cantidadEnStock} en stock, costo: ${producto.costo}</p>
-            <a href="#" class="btn btn-success">
-              Comprar
-            </a>
-          </div>
-        </div>*/
-
